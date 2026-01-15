@@ -3,66 +3,48 @@ import { svgPreloader, svgAddContact, svgAdd, svgCrossContact, svgMail, svgVk, s
 window.onload = function () {
     const preloader = document.querySelector('.preloader');
     if (preloader) {
-        preloader.classList.add('non') // Скрываем прелоадер
+        preloader.classList.add('non')
     }
 };
 
-// Добавление на сервер нового клиента(отправляем данные о новом клиенте на сервер) 
 async function serverAddClient(obj) {
-    //отправляем запрос
     const response = await fetch('http://localhost:3000/api/clients', {
-        //указываем что именно хотим добавить
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }, //говорим серверу что это JSON формат
-        //в body сама информация и преобразуем в строку
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(obj),
     });
-    //тут будут храниться данные которые вернет сервер(получаем  ответ с информацией о созданном клиенте.)
     let data = await response.json()
     console.log('ответ от сервера:', data);
-    return data  // возвращаем данные
+    return data
 }
 
-//получаем данные с сервера
 async function serverGetClient() {
-    //отправляем запрос
     const response = await fetch('http://localhost:3000/api/clients/', {
-        //указываем что именно хотим добавить
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' }//говорим серверу что это JSON формат
+        headers: { 'Content-Type': 'application/json' }
     })
     let data = await response.json()
-    return data  // возвращаем данные
+    return data
 }
 
 
 async function serverDeleteClient(id) {
-    //отправляем запрос
     const response = await fetch('http://localhost:3000/api/clients/' + id, {
-        //указываем что именно хотим добавить
         method: 'DELETE',
     });
-    //тут будут храниться данные которые вернет сервер(получаем  ответ с информацией о созданном клиенте.)
     let data = await response.json()
-    return data  // возвращаем данные
+    return data
 }
 
-
-// id клиента,которого нужно обновить,clientObj сам объект с изменеными данными
 async function serverChangeClient(id, clientObj) {
-    //отправляем запрос с id нужного нам клиента
     const response = await fetch('http://localhost:3000/api/clients/' + id, {
-        //указываем что именно хотим добавить
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' }, //говорим серверу что это JSON формат
-        //в body сама информация и преобразуем в строку
-        body: JSON.stringify(clientObj), // отправляются измененные данные клиента в формате JSON, полученные из clientObj
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(clientObj),
     });
-    //Функция ждет ответа от сервера с помощью оператора await и преобразует ответ сервера из формата JSON в объект JavaScript с помощью метода response.json().
     let data = await response.json()
 
     console.log('ответ от сервера:', data);
-    //возвращаем данные от сервера, которые представляют собой обновленные данные клиента после успешного обновления на сервере
     return data
 }
 
@@ -120,10 +102,8 @@ function createContsctLinck(type, value, svg, item) {
 
     const link = document.createElement('a');
     link.classList.add('contacts__link');
-    //установка содержимого ссылки
     link.innerHTML = svg;
 
-    //установка  атрибута href в зависимости от типа
     if (type === 'Email') {
         link.href = `mailto:${value.trim()}`
     } else if (type === 'Телефон') {
@@ -133,26 +113,18 @@ function createContsctLinck(type, value, svg, item) {
         link.href = value.trim()
     }
     link.append(setTooltip.tooltip)
-    // //добавление  элемента в родительский элемент
     item.appendChild(link)
-    // console.log(link);
-    // return item
-    //  linkItem ссылается на только что созданный link
+
     const linkItem = item; // Сохраняем ссылку на элемент
-    // console.log(item); // выводит  созданный элемент
 
     return linkItem; // Возвращаем созданный элемент
 
 }
 
-// создание элемента контакта в зависимости от типа
 function createContsctItemByType(type, value, item) {
-    //какой блок кода выполнить в зависимости от значения type
     switch (type) {
 
-        //если type равен Телефон
         case 'Телефон':
-            //блок кода,который выполнится
             createContsctLinck(type, value, svgPhone, item);
             break
         case 'Facebook':
@@ -170,7 +142,6 @@ function createContsctItemByType(type, value, item) {
         case 'Другое':
             createContsctLinck(type, value, svgOther, item);
             break
-        //Если type не соответствует ни одному из указанных значений, выполняется блок
         default:
     }
 
@@ -201,7 +172,6 @@ $buttonAddClient.append($spanBtnAdd)
 $buttonAddClient.innerHTML += svgAdd;
 
 $divContainer.append($buttonAddClient)
-
 
 //Создание таблицы
 const $divClients = document.getElementById('clients')//в котором хранится вся таблица
@@ -291,19 +261,15 @@ $divClients.append($tabel)
 $tabel.append($sortingDisplay, $tabelBody)
 
 
-// Создаем прелоадер и добавляем его в таблицу
 const preloader = createPreloader();
 $divClients.appendChild(preloader);
 
-// Массив для хранения данных клиентов
 let ClientList = [];
-// ClientList.push(getpushClients)
-ClientList = await serverGetClient() //получаем всех клиентов с сервера
+ClientList = await serverGetClient()
 render(ClientList)
 searchClients(ClientList);
 
 
-//создание модального "Добавить клиента"
 function createWindow(open, close, oneClient = null) {
 
     const $divModalWindowContainer = document.createElement('div')
@@ -312,7 +278,6 @@ function createWindow(open, close, oneClient = null) {
     $divModalWindowContainer.classList.add('modal')
     $divModalBox.classList.add('modal__box')
 
-    //Кнопка закрытия модального окна 
     const $btnClose = document.createElement('button')
     $btnClose.classList.add('btn__close')
     $btnClose.textContent = 'X'
@@ -331,22 +296,19 @@ function createWindow(open, close, oneClient = null) {
     $inputModalSurname.name = 'Surname'
     $inputModalSurname.classList.add('input__form__modal')
     $inputModalSurname.id = 'floatingSurname';
-    $inputModalSurname.required='true'
+    $inputModalSurname.required = 'true'
 
     $inputModalName.placeholder = 'Имя'
     $inputModalName.name = 'Name'
     $inputModalName.classList.add('input__form__modal')
     $inputModalName.id = 'floatingName';
-    $inputModalName.required='true'
-
+    $inputModalName.required = 'true'
 
     $inputModalMiddelname.placeholder = 'Отчество'
     $inputModalMiddelname.name = 'Middelname'
     $inputModalMiddelname.classList.add('input__form__modal')
     $inputModalMiddelname.id = 'floatingLastName';
-    $inputModalMiddelname.required='true'
-
-        // console.log(oneClient);
+    $inputModalMiddelname.required = 'true'
 
     //валидация формы
     const $errorBlock = document.createElement('p');
@@ -367,50 +329,39 @@ function createWindow(open, close, oneClient = null) {
 
     $errorBlock.append($writeSurname, $writeName, $writeLastName, $requiredValue, $unacceptableLetter, $requiredContacts)
 
-    //Функция добавления контактов в форму
     function addContact() {
-        // Массив с контактами
-        let contactsArr = []; // Объявляем массив здесь, чтобы он очищался при каждом добавлении клиента
+        let contactsArr = [];
 
-        //сбор контактов
-        const divs = document.querySelector('.div__add__contact')//находим div
+        const divs = document.querySelector('.div__add__contact')
 
-        const selects = divs.querySelectorAll('select')//из дива находим все select
+        const selects = divs.querySelectorAll('select')
 
-        const inputs = divs.querySelectorAll('input')//из дива находим все input
+        const inputs = divs.querySelectorAll('input')
         for (let i = 0; i < selects.length; i++) {
             contactsArr.push({
-                type: selects[i].value,//получаем конкретный селект.
-                value: inputs[i].value//получаем конкретный инпут.
+                type: selects[i].value,
+                value: inputs[i].value
             })
         }
 
-
-        //Очищаем содержимое инпутов
         const inputsModalForm = document.querySelectorAll('.input__form__modal')
-        //перебираем каждое поле input
         inputsModalForm.forEach(input => {
-            input.value = ''; // устанавливаем значение для каждого поля
+            input.value = '';
         });
 
-        // Если контакты не были введены, создаем пустой массив
         if (contactsArr.length === 0) {
-            contactsArr = []; // Пустой массив, если контакты не введены
+            contactsArr = [];
         }
 
-        return contactsArr; // Возвращаем массив контактов
+        return contactsArr;
 
     }
 
-    //используется для проверки, передан ли объект oneClient в функцию createWindow. 
-    //Если объект oneClient существует (то есть не равен null или undefined),
-    //то значения полей ввода (инпутов) для имени, фамилии и отчества заполняются данными из этого объекта
+
     if (oneClient) {
         $inputModalName.value = oneClient.name
         $inputModalSurname.value = oneClient.surname
         $inputModalMiddelname.value = oneClient.lastName
-        // $inputIputField.value = oneClient.contacts
-        // createDropdownlist(oneClient.contacts)
     }
 
     //создание заголовка модал.окна "Новый клиента"
@@ -418,7 +369,6 @@ function createWindow(open, close, oneClient = null) {
     $titleModalAddClient.classList.add('title__modal')
     $titleModalAddClient.textContent = 'Новый клиент'
 
-    //создание заголовка модал.окна "Изменить данные"
     const $divWrapperСhange = document.createElement('div')
     $divWrapperСhange.classList.add('Wrapper__Сhange')
     const $titleModalСhange = document.createElement('h2')
@@ -430,23 +380,17 @@ function createWindow(open, close, oneClient = null) {
     $spanTitelChange.classList.add('id__span')
     $divWrapperСhange.append($titleModalСhange, $spanTitelChange)
 
-
-    //Кнопка "удалить клиента"
     const $btnDeleteChange = document.createElement('button')
     $btnDeleteChange.textContent = 'Удалить клиента'
     $btnDeleteChange.classList.add('btn__delete__change')
 
-
-
-
-    //Создание кнопки "добавить контакт"  в модальном окне 
     function createbtnAddContsct() {
-        const $divContainerAddContact = document.createElement('div')//контейнер для контактов общий и кнопка
+        const $divContainerAddContact = document.createElement('div')
         $divContainerAddContact.classList.add('div__add__contact')
 
-        const $divWrapperContacts = document.createElement('div')//див для дива с контактми 
+        const $divWrapperContacts = document.createElement('div')
         $divWrapperContacts.classList.add('divWrapperContacts')
-        const $divContacts = document.createElement('div')//сам див с контактами сами контакты(выпадающий список и инпут-поле ввода)
+        const $divContacts = document.createElement('div')
         $divContacts.classList.add('divContacts')
 
         const $btnModalAdd = document.createElement('button')
@@ -468,9 +412,6 @@ function createWindow(open, close, oneClient = null) {
     }
     const btnAddContact = createbtnAddContsct()
 
-
-
-    //Создане дива "Добавить контакт" 
     function createDropdownlist(contactType = null, contactValue = null) {
         const $divdropdownlist = document.createElement('div')
         const $formdropdownlist = document.createElement('div')
@@ -505,15 +446,12 @@ function createWindow(open, close, oneClient = null) {
         $labeldropdownlist.append($selectdropdownlist)
         $selectdropdownlist.append($optiondropdownAddPhone, $optiondropdownPhone, $optiondropdownMail, $optiondropdownVK, $optiondropdownFb, $optiondropdownOther)
 
-        //Добавление дива для ввода к выпадающему списку
         const $inputIputField = document.createElement('input')
         $inputIputField.placeholder = 'Введите данные контакта'
         $inputIputField.classList.add('dropdownlist__input')
         $inputIputField.name = 'данные контакта'
-        // $inputIputField.required='true'
         $divdropdownlist.classList.add('open')
 
-        //кнопка удаления контакта в окне "Изменить"
         const $btnCross = document.createElement('button')
         $btnCross.classList.add('btn__cross')
         $btnCross.type = 'button'
@@ -526,13 +464,10 @@ function createWindow(open, close, oneClient = null) {
             $divdropdownlist.remove();
         });
 
-
-        // Установка выбранного значения, если оно передано
         if (contactType) {
             $selectdropdownlist.value = contactType;
         }
 
-        // Установка значения инпута, если оно передано
         if (contactValue) {
             $inputIputField.value = contactValue;
         }
@@ -545,21 +480,15 @@ function createWindow(open, close, oneClient = null) {
             $btnCross
         }
     }
-    // let divdropdownlist= createDropdownlist()
-
-    // Здесь добавляем обработчик события для кнопки добавления контакта
     btnAddContact.$btnModalAdd.onclick = contactAddFunc;
     function contactAddFunc(event) {
         event.preventDefault();
-        //получаем дивы контактов
         const contactdivs = document.getElementsByClassName('divdropdownlist')
 
-        //если меньше 9 создаем див
         if (contactdivs.length < 9) {
             const dropdown = createDropdownlist();
             btnAddContact.$divContacts.append(dropdown.$divdropdownlist)
         } else {
-            //иначе скрываем кнопку 
             btnAddContact.$btnModalAdd.classList.add('hide')
         }
     }
@@ -576,14 +505,10 @@ function createWindow(open, close, oneClient = null) {
     $btnСancel.classList.add('btn__cancel')
     $btnСancel.type = 'button'
 
-    //При нажатии на кнопку "Отмена" закрывается модальное окно 
     $btnСancel.addEventListener('click', function () {
-        $divModalWindowContainer.remove()//удаляем модальное окно
+        $divModalWindowContainer.remove()
     })
 
-
-
-    //Создание окна при нажатии на "Удалить"
     const $divWindowDelete = document.createElement('div')
     $divWindowDelete.classList.add('modal__box__delete')
 
@@ -600,7 +525,7 @@ function createWindow(open, close, oneClient = null) {
     $btnWindowDelete.classList.add('btn__delete')
 
     $btnWindowDelete.addEventListener('click', function () {
-        $divModalWindowContainer.remove()//удаляем модальное окно
+        $divModalWindowContainer.remove()
     })
 
     const $btnWindowCancel = document.createElement('button')
@@ -610,142 +535,87 @@ function createWindow(open, close, oneClient = null) {
     const $btnCloseWidow = document.createElement('button')
     $btnCloseWidow.classList.add('btn__close')
     $btnCloseWidow.textContent = 'X'
-    // Добавляем обработчик события для кнопки удаления
-
 
     $divWindowDelete.append($btnCloseWidow, $titelDelete, $spanDelete, $btnWindowDelete, $btnWindowCancel)
-    //При нажатии на кнопку "Отмена" закрывается модальное окно 
     $btnWindowCancel.addEventListener('click', function () {
-        $divModalWindowContainer.remove()//удаляем модальное окно
+        $divModalWindowContainer.remove()
     })
 
-    //При нажатии на кнопку "X" закрывается  модальное окно 
     $btnClose.addEventListener('click', function (event) {
         event.preventDefault()
-        $divModalWindowContainer.remove()//удаляем модальное окно
+        $divModalWindowContainer.remove()
     })
 
-    //апппенд окна 
     $divContainer.append($divModalWindowContainer)
     $divModalWindowContainer.append($divModalBox, $divWindowDelete)
 
     $divModalBox.append($divWrapperСhange)
 
-    // let divlist = createDropdownlist()
-
     open({
         $divModalBox, $divWrapperСhange, $titleModalAddClient, $btnСancel, $btnWindowDelete, $formInputsModal,
         $spanTitelChange, $btnDeleteChange, $divWindowDelete, $btnSave, btnAddContact, createDropdownlist
     })
-    //добавляем в основное окно кнопку закрыть и заголовок и форму
     $divModalBox.append($btnClose, $titleModalAddClient, $formInputsModal)
-    //добавляем в форму все инпуты и див с контактами
     $formInputsModal.append($inputModalSurname, $inputModalName, $inputModalMiddelname, btnAddContact.$divContainerAddContact, $errorBlock,
         $btnSave, $btnСancel, $btnDeleteChange)
 
     close({ $btnСancel, $btnDeleteChange })
-    // btnAddContact.$divContacts.append(divdropdownlistAdd)
 
-    //При нажатии на кнопку "X" закрывается  модальное окно 
     $btnCloseWidow.addEventListener('click', function (event) {
         event.preventDefault()
-        $divModalWindowContainer.remove()//удаляем модальное окно
+        $divModalWindowContainer.remove()
     })
 
-    // //Отправка формы и валидация
     $formInputsModal.addEventListener('submit', async function createSubmit(event) {
         event.preventDefault()
 
-           // Валидация контактов
-    const validatedContact = validationContacts($formInputsModal);
-    if (!validatedContact) {
-        return; // Если валидация не прошла, выходим из функции.
-    }
-        //  debugger;
-        // // Проверка данных ФИО
-        // const validatedClient = validateClientForm();
-        // if (!validatedClient) {
-        //     console.log('проверка прошла ');
-        //     return; // Если проверка не прошла, выходим из функции.
 
-        // }
-        // const formContacts = document.querySelector('.form__inputs__modal__add')
-        // // console.log(formContacts)
+        const validatedContact = validationContacts($formInputsModal);
+        if (!validatedContact) {
+            return;
+        }
 
-
-        // // Проверка данных контакта .
-        // const validatedContact = validationContacts(formContacts);
-        // if (!validatedContact) {
-        //     console.log('проверка прошла ');
-        //     return; // Если проверка не прошла, выходим из функции.
-        // }
-
-        // // Сбор контактов из состояния формы.
-        // const contacts = addContact();  //остается  без изменений и возвращает массив контактов.
-
-        // // валидация контактов
-        // if (contacts.length > 0) {
-        //     for (const contact of contacts) {
-        //         const isValid = validateClientForm(contact.type, contact.value);
-        //         if (!isValid) {
-        //             return; // выходим если любой контакт не валиден.
-        //         }
-        //     }
-        // }
-
-
-
-        //получаем значение из формы(собираем данные из формы)
         let clientObj = {
             name: $inputModalName.value.trim(),
             surname: $inputModalSurname.value.trim(),
             lastName: $inputModalMiddelname.value.trim(),
-            contacts: addContact()//добавляется массив контактов 
+            contacts: addContact()
         }
         console.log(clientObj);
 
         console.log(oneClient);
-        //отправляем данные на сервер
         if (oneClient) {
-            // Отправляем запрос к  серверу для изменения данных клиента
             await serverChangeClient(oneClient.id, clientObj);
-            ClientList = await serverGetClient()//приходит массив
+            ClientList = await serverGetClient()
             console.log(ClientList);
 
         } else {
-            //await приостанавливает выполнение кода до тех пор, пока промис, возвращаемый serverAddClient, не будет разрешен.Ждем пока сервер обработает запрос и вернет ответ.
-            //Ответ(данные) от сервера сохраняется в переменной serverData
+
             let serverData = await serverAddClient(clientObj)
 
-            // Проверка данных, возвращаемых сервером
             console.log('Добавлен клиент:', serverData);
-            //добавляем объект полученный с сервера
             ClientList.push(serverData)
             console.log(ClientList);
         }
-        $divModalWindowContainer.remove()//удаляем модальное окно
+        $divModalWindowContainer.remove()
         render(ClientList)
     })
 }
 
 
-//При нажатии на кнопку "Добавить клиента" открывается модальное окно 
 $buttonAddClient.addEventListener('click', function () {
     createWindow(
 
-        //вызываем при открытии модал.окна open()
         function () {
             console.log('ззз')
         },
 
-        //вызываем при закрытии модал.окна close()
         function () {
             console.log('закрыто')
         }
     )
 })
 
-//получаем дату в формате дд.мм.гг
 function formatDate(date) {
 
     let dd = date.getDate();
@@ -769,50 +639,26 @@ function formatDate(date) {
 const arrData = await serverGetClient();
 
 function render(arrData) {
-    // console.log('список клиентов:', arrData); // Логируем входные данные
-
-    // // Проверяем, является ли arrData массивом
-    // if (!Array.isArray(arrData)) {
-    //     console.error('arrData не является массивом:', arrData);
-    //     return; // Прекращаем выполнение функции, если это не массив
-    // }
-    // Очищаем таблицу
     $tabelBody.innerHTML = ''
-    let copyClientList = [...arrData]//массив с клиентами
+    let copyClientList = [...arrData]
 
-
-    //проходимся по массиву 
     for (const oneClient of copyClientList) {
         oneClient.id = oneClient.id
         oneClient.fio = oneClient.surname + ' ' + oneClient.name + ' ' + oneClient.lastName
         oneClient.contacts = oneClient.contacts
-        oneClient.createdAt = oneClient.createdAt//преобразуем строку  с помощью объекта Date в дату и время 
-        oneClient.updatedAt = oneClient.updatedAt//преобразуем строку  с помощью объекта Date в дату и время 
+        oneClient.createdAt = oneClient.createdAt
+        oneClient.updatedAt = oneClient.updatedAt
     }
-    // console.log(arrData);
 
-    //Отрисовка 
     for (const oneClient of ClientList) {
         const $clientTr = createClient(oneClient)
 
-        // Добавляем новую строку в тело таблицы
         $tabelBody.append($clientTr)
     }
-
-    // const $clientTr = createClient(oneClient);
-    // $tabelBody.append($clientTr);
 }
-// console.log(ClientList);
 render(ClientList)
 
-// $btnWindowDelete.addEventListener('click', async function (){
-//     await serverDeleteClient(oneClient.id)
-//     $clientTr.remove()
-//     })
-
-//функция создания строки  клиента(добавления клиента в таблицу)
 function createClient(oneClient) {
-    //шапка-отрисовка таблицы
     const $clientTr = document.createElement('tr')
     const $clientid = document.createElement('td')
     $clientid.classList.add('client__id')
@@ -827,132 +673,98 @@ function createClient(oneClient) {
     const $clientActions = document.createElement('td')
     $clientTr.classList.add('clients__item')
 
-    //установление текстового содержимого ячеек 
     $clientid.textContent = oneClient.id
     $clientfio.textContent = oneClient.fio
     $clientTimeCreate.textContent = formatDate(new Date(oneClient.createdAt))
     $clientlastChang.textContent = formatDate(new Date(oneClient.updatedAt))
 
-    // console.log(oneClient);
-    // Общее количество контактов
     const totalContacts = oneClient.contacts?.length;
 
-    // console.log(oneClient);
-    // console.log(totalContacts);
-    // Проверка на наличие контактов
     if (oneClient.contacts && oneClient.contacts.length > 0) {
-        // Отображение контактов (не более 4)
         oneClient.contacts.forEach((contact, index) => {
-            if (index < 4) { // Отображаем только первые 4 контакта
+            if (index < 4) {
                 createContsctItemByType(contact.type, contact.value, $clientContacts);
             }
         });
     } else {
-        // Если контактов нет, добавляем пустую ячейку
-        $clientContacts.textContent = ''; // Пустая строка
+        $clientContacts.textContent = '';
     }
-    // Проверка на количество скрытых контактов
     if (totalContacts > 4) {
-        const hiddenContactsCount = totalContacts - 4; // Скрытые контакты
+        const hiddenContactsCount = totalContacts - 4;
         const $hiddenContactsSpan = document.createElement('span');
         $hiddenContactsSpan.classList.add('hidden__contacts');
         $hiddenContactsSpan.textContent = `+${hiddenContactsCount}`;
 
-        // Обработчик события для раскрытия скрытых контактов
         $hiddenContactsSpan.addEventListener('click', () => {
-            // Отображаем скрытые контакты
             oneClient.contacts.forEach((contact, index) => {
-                if (index >= 4) { // Показываем скрытые контакты
+                if (index >= 4) {
                     createContsctItemByType(contact.type, contact.value, $clientContacts);
                 }
             });
-            $hiddenContactsSpan.remove(); // Убираем счетчик после отображения скрытых контактов
+            $hiddenContactsSpan.remove();
         });
 
-        $clientContacts.appendChild($hiddenContactsSpan); // Добавляем кнопку в ячейку контактов
+        $clientContacts.appendChild($hiddenContactsSpan);
     }
-
-    //преобразуем массив контактов в строку
-    // $clientContacts.textContent = oneClient.contacts.map(contact => `${contact.type}: ${contact.value}`).join('\n');
-
 
     const $btnChange = document.createElement('button')
     $btnChange.textContent = 'Изменить'
     $btnChange.classList.add('clients__edit')
 
-    //При нажатии на кнопку "Изменить" открывается модальное окно 
     $btnChange.addEventListener('click', function () {
         createWindow(
-            //вызываем при открытии модал.окна open()
             function ({ $divWrapperСhange, $titleModalAddClient, $btnCross, $divWindowDelete, $spanTitelChange, btnAddContact, createDropdownlist }) {
 
                 $spanTitelChange.textContent = 'ID:' + '' + oneClient.id
-
 
                 if (oneClient && oneClient.contacts) {
                     for (let contact of oneClient.contacts) {
                         if (contact) {
                             const dropdown = createDropdownlist(contact.type, contact.value);
-                            //вызываем функцию добавления контакта
                             btnAddContact.$divContacts.append(dropdown.$divdropdownlist);
-
                         }
                     }
                 }
 
                 $divWrapperСhange.classList.add('open')
                 $titleModalAddClient.classList.add('close')
-                // $btnCross.classList.add('open')
                 $spanTitelChange.classList.add('open')
                 $divWindowDelete.classList.remove('open')
             },
-            //вызываем при закрытии модал окна 
             function ({ $btnСancel, $btnDeleteChange }) {
                 $btnСancel.classList.add('close')
                 $btnDeleteChange.classList.add('open')
             },
-            // Передаем oneClient как третий параметр.Передаем текущего клиента в модальное окно
             oneClient
         )
 
     })
 
-    // //При нажатии на кнопку "Удалить" открывается модальное окно 
     let $btnDelete = document.createElement('button')
     $btnDelete.textContent = 'Удалить'
     $btnDelete.classList.add('clients__delete')
 
     $btnDelete.addEventListener('click', function () {
-        ////удаление строки
-        // $btnWindowDelete.addEventListener('click', async function () {
-        //     await serverDeleteClient(oneClient.id);
-        //     $clientTr.remove();
-        // });
+
         createWindow(
-            //вызываем при открытии модал.окна open()
             function ({ $divModalBox, $divWrapperСhange, $titleModalAddClient, $divWindowDelete, $btnWindowDelete }) {
                 $divWindowDelete.classList.add('open')
                 $divWrapperСhange.classList.remove('open')
                 $divModalBox.classList.add('close')
                 $titleModalAddClient.classList.add('close')
 
-                //удаление клиента
                 $btnWindowDelete.addEventListener('click', async function () {
-                    await serverDeleteClient(oneClient.id);//удалила с сервера 
+                    await serverDeleteClient(oneClient.id);
 
-                    // Полностью обновляем ClientList новыми данными на сервере
                     ClientList = await serverGetClient()
 
-                    $clientTr.remove();//удаление строки
+                    $clientTr.remove();
                 });
 
             },
 
-            //вызываем при закрытии модал окна 
             function () {
-
             }
-
         )
     })
 
@@ -962,71 +774,42 @@ function createClient(oneClient) {
     return $clientTr
 }
 
-
 //Сортировка 
 function sortTabel() {
-    //получаем доступ к таблице и заголовкам
     const tabel = document.querySelector('table');
-    const headers = tabel.querySelectorAll('th');//получаем все заголовки
-    // Метод querySelectorAll('th') выбирает все элементы <th> (заголовки таблицы) на странице и возвращает их в виде коллекции.
-    //Результат вызова метода это NodeList (набор узлов-элементов th)
+    const headers = tabel.querySelectorAll('th');
+
     const tbody = tabel.querySelector('tbody');
-    const headersArray = Array.from(headers); // Преобразуем NodeList в массив
+    const headersArray = Array.from(headers);
 
-    //Направления сортировки для каждого заголовка таблицы.
-    //это массив,который записан в переменную directions
-    // для хранения текущего направления сортировки для каждого заголовка таблицы
     const directions = headersArray.map(() => '')
-    // console.log(directions);
 
-    //форматирование типа и контента
     function transformText(type, content) {
         switch (type) {
             case 'id':
-                return parseFloat(content);//из строчки с буквами возвращаем только цифры
+                return parseFloat(content);
             case 'create':
             case 'update':
-                //content это дата создания и обновления
-                return content.split('.').reverse().join('-'); //обработка и сортировка контента-даты
-            //text - это фио клиентов 
+                return content.split('.').reverse().join('-');
             case 'text':
             default:
                 return content;
         }
     }
 
-    //сортировка строк от выбраного заголовка
     function sortColumn(index) {
-        //получаем тип хедера по индексу 
         const type = headers[index].getAttribute('data-type');
-        // console.log(type);
-        const rows = tbody.querySelectorAll('tr')//получаем саму строку
-
-        //Определяем направление сортировки direction и multiply
-
-        //Проверка текущего направления сортировки
-        const direction = directions[index] || 'sortUp';//если не было предыдущей сортировки, то по умолчанию используется сортировка по возрастанию.
-
-        //определения порядка, в котором строки будут упорядочены
-        //direction === 'sortUp' проверка. Равно ли тек.состояние sortUp 
-        //если нет,то multiply равно 1, это означает, что строки будут отсортированы по возрастанию
-        //если multiply равно -1, строки будут отсортированы по убыванию
+        const rows = tbody.querySelectorAll('tr')
+        const direction = directions[index] || 'sortUp';
         const multiply = direction === 'sortUp' ? 1 : -1;
+        const newRows = Array.from(rows);
 
-
-        //Сортировка строк
-        const newRows = Array.from(rows); //нов массив с строками
-
-        //Для каждой пары строк получаем значение и форматируем его
         newRows.sort((row1, row2) => {
-            //получаем контент
             const cellA = row1.querySelectorAll('td')[index].textContent
             const cellB = row2.querySelectorAll('td')[index].textContent
 
-            //форматируем контент
             const a = transformText(type, cellA)
             const b = transformText(type, cellB)
-            // console.log(a,b);
             switch (true) {
                 case a > b:
                     return 1 * multiply;
@@ -1041,23 +824,18 @@ function sortTabel() {
             }
         });
 
-        //удаляем старые строки,чтобы добавить отсортированные строки
         Array.from(rows).forEach(row => {
             tbody.removeChild(row);
         });
 
-        //обновление направления строки
         directions[index] = direction === 'sortUp' ? 'sortDown' : 'sortUp';
 
-        //Добавление отсортированных строк обратно в таблицу:
         newRows.forEach(newRow => {
             tbody.appendChild(newRow);
         });
     }
-    //Добавление обработчиков событий к заголовкам
-    //перебераем все заголовки
+
     headersArray.forEach((header, index) => {
-        //добавляем клик к каждому заголовку 
         header.addEventListener('click', () => {
             sortColumn(index);
         });
@@ -1066,73 +844,44 @@ function sortTabel() {
 }
 sortTabel()
 
-// console.log(ClientList);
-
 function searchClients() {
     const findList = document.querySelector('.find-list');
     const input = document.querySelector('.header__input');
-    let timeoutId; //хранение идентификатора таймаута
+    let timeoutId;
 
-    // Функция для обновления списка автодополнения
     function updateFindList(clients) {
-        findList.innerHTML = ''; //удаляем  из списка  ранее введеные значения
-        //перебираем массив с объектами клиентов, соответствующих текущему запросу
+        findList.innerHTML = '';
         clients.forEach(client => {
             const findItem = document.createElement('li');
-            // const findLink = document.createElement('a');
 
             findItem.classList.add('find-list__item');
-            // findLink.classList.add('find-list__link');
-            //создаем элементы списка
             findItem.textContent = `${client.name} ${client.surname} ${client.lastName}`;
-            // findLink.href = '#';
 
-            // findItem.append(findLink);
             findList.append(findItem);
         });
     };
 
-    //ввод поля
     input.addEventListener('input', async () => {
-        const value = input.value.trim();//забирается тек.значение поля
-
-        // Очищаем предыдущий таймаут
+        const value = input.value.trim();
         clearTimeout(timeoutId);
 
-        // Устанавливаем новый таймаут
         timeoutId = setTimeout(async () => {
             if (value !== '') {
-                //запрос на данные с сервера, передавая введенное значение для поиска 
+
                 ClientList = await findClients(value);
-                updateFindList(ClientList); // Обновляем список с полученными данными 
-                // перерисовываем  таблицу,отображаем  только тех клиентов, которые соответствуют запросу.
-                // render(ClientList) 
+                updateFindList(ClientList);
+
             } else {
-                // если поле ввода пустое, очищаем список и восстанавливаем всех клиентов
                 findList.innerHTML = '';
-                // render(ClientList); // Восстанавливаем всех клиентов
-                ClientList = await serverGetClient(); // Получаем всех клиентов
+                ClientList = await serverGetClient();
             }
-            // Рендерим клиентов
             render(ClientList);
         }, 300);
     });
 }
-// //перерисовка таблицы 
-// async function redrawTabel(clients) {
-//     const tbodyFind = document.querySelector('.clients__tbody');
-//     tbodyFind.innerHTML = ''; // Очищаем предыдущие записи 
 
-//     // перебираем массив клиентов и передаем каждого клиента в функцию 
-//     clients.forEach(client => {
-//         // Отрисовываем клиентов полученных на основе поиска
-//         tbodyFind.append(createClient(client));
-//     });
-// }
 
-// //Валидация формы ФИО
 function validateClientForm() {
-    //получаем элименты 
     const userName = document.getElementById('floatingName');
     const userSurname = document.getElementById('floatingSurname');
     const userLastName = document.getElementById('floatingLastName');
@@ -1147,15 +896,12 @@ function validateClientForm() {
 
     function onInputValue(input) {
         input.addEventListener('input', () => {
-            //когда будет ошибка бордер красный
             input.classList.add('error')
             for (const item of validateArray) {
-                //у каждой ошибки будет чиститься поле
                 item.textContent = '';
             }
         });
 
-        //устанавливаем обработчика на инпут oncut, oncopy, onpaste
         input.oncut = input.oncopy = input.onpaste = () => {
             input.classList.add('noerror')
             for (const item of validateArray) {
@@ -1163,31 +909,24 @@ function validateClientForm() {
             }
         };
 
-        // если значение поля ввода изменилось и пользователь закончил ввод
         input.onchange = () => {
             input.classList.add('noerror')
-            //проверка на заполнение инпутов
             if (userSurname.value && userName.value && userLastName.value) {
                 for (const item of validateArray) {
-                    //убираем текст об ошибках 
                     item.textContent = '';
                 }
             }
         }
     }
 
-    //вызываем для каждого инпута проверку
     onInputValue(userName);
     onInputValue(userSurname);
     onInputValue(userLastName);
 
-    //проверка вводимого фио
     function checkRequiredName(input, message, name) {
-        //если ничего не было введено и форму хотели отправить
         if (!input.value) {
             input.classList.add('error')
             message.textContent = `Введите ${name} клиента!`;
-            //проверка не проходит фолс 
             return false;
         } else {
             message.textContent = '';
@@ -1195,9 +934,7 @@ function validateClientForm() {
         return true;
     }
 
-    //проверка на то что ввел пользователь
     function checkRegexp(input, regexp) {
-        //соответствует ли строка заданному регулярному выражению regexp
         if (regexp.test(input.value)) {
             input.classList.add('error')
             unacceptableLetter.textContent = 'Недопустимые символы!';
@@ -1207,12 +944,6 @@ function validateClientForm() {
         return true;
     }
 
-    //вызываем функции для каждого инпута
-    //первые три строки проверяют  было ли введено значение в обязательные поля
-    //checkRequiredName принимает три элемена ввода,которые надо проверить
-    //второй аргумент это где сообщение об ошибке будет храниться
-    //формулируем ошибку
-    //а в после сообщения об ошибки,функция прекращает свои действия
     if (!checkRequiredName(userSurname, writeSurname, 'Фамилию')) { return false };
     if (!checkRequiredName(userName, writeName, 'Имя')) { return false };
     if (!checkRequiredName(userLastName, writeLastName, 'Отчество')) { return false };
@@ -1221,22 +952,15 @@ function validateClientForm() {
     if (!checkRegexp(userSurname, regexp)) { return false };
     if (!checkRegexp(userLastName, regexp)) { return false };
 
-    // Создаем объект клиента для возврата
     const validatedClient = {
         surname: userSurname.value.trim(),
         name: userName.value.trim(),
         lastName: userLastName.value.trim()
     };
 
-    // Возвращаем объект клиента
     return validatedClient;
 }
 
-
-
-//Валидация контактов.
-
-//удалит все, кроме цифр, из строки, введенной пользователем, и вернет строку, содержащую только цифры.
 function getInputNumbersValue(input) {
     return input.value.replace(/\D/g, '');
 }
@@ -1245,101 +969,75 @@ function showError(input, message) {
     const errorMessage = document.createElement('span');
     errorMessage.classList.add('error')
     errorMessage.textContent = message;
-    input.parentElement.appendChild(errorMessage); // Добавляем сообщение об ошибке после поля ввода
+    input.parentElement.appendChild(errorMessage);
 }
 
 function hideError(event) {
-    const input = event.target; // Получаем элемент, вызвавший событие
-    const message = input.parentElement.querySelector('.error'); // Ищем сообщение об ошибке в родительском элементе
+    const input = event.target;
+    const message = input.parentElement.querySelector('.error');
 
     if (message) {
-        message.remove(); // Удаляем элемент сообщения об ошибке
+        message.remove();
     }
 
-    input.classList.remove('error'); // Убираем класс ошибки из поля ввода
+    input.classList.remove('error');
 }
 
 
-//валадация контактов
 function validationContacts(form) {
-    //  // Проверяем, что form - это элемент формы
-    //  if (!(form instanceof HTMLElement)) {
-    //     console.error('Переданный аргумент не является элементом формы');
-    //     return false; // или обработайте ошибку по-другому
-    // }
-
     const userName = document.getElementById('floatingName');
     const userSurname = document.getElementById('floatingSurname');
     const userLastName = document.getElementById('floatingLastName');
 
-// Проверка на пустые поля
-if (!userSurname.value.trim()) {
-    alert('Фамилия не введена!');
-    return false;
-}
-if (!userName.value.trim()) {
-    alert('Имя не введено!');
-    return false;
-}
-if (!userLastName.value.trim()) {
-    alert('Отчество не введено!');
-    return false;
-}
+    if (!userSurname.value.trim()) {
+        alert('Фамилия не введена!');
+        return false;
+    }
+    if (!userName.value.trim()) {
+        alert('Имя не введено!');
+        return false;
+    }
+    if (!userLastName.value.trim()) {
+        alert('Отчество не введено!');
+        return false;
+    }
 
-
-    //переменная для статуса валидации
     let isValidate = true;
 
-    // Получаем элементы селектора и инпута
     const select = document.querySelector('.selectCotacts');
-    //получение полей ввода
     const inputFields = form.querySelectorAll('.dropdownlist__input');
-    // console.log(select);
-    // если есть селект,то 
     if (select) {
         select.addEventListener('change', () => {
-            // Получаем выбранное значение
             const selectedValue = select.value;
 
-            input.dataset.type = selectedValue; // 
+            input.dataset.type = selectedValue;
         });
     }
 
-    // console.log(clientObj);
-    //проходим по каждому полю
     for (const input of inputFields) {
 
-        // Проверка на пустое поле
         if (!input.value.trim()) {
             showError(input, "Ошибка: Поле не может быть пустым!");
             input.addEventListener("input", hideError);
             isValidate = false;
-            continue; // Пропускаем это поле и переходим к следующему
+            continue;
         }
 
-        //проверка типа ввода
-        //data-type текущего поля ввода выполняются разные проверки.
         switch (input.dataset.type) {
 
             case "phone":
                 const regExpPhone = /^\d{11,12}$/g;
-                //если проверка не проходит,то 
                 if (!regExpPhone.test(getInputNumbersValue(input))) {
                     showError(
                         input,
                         "Ошибка: Номер телофона должен содержать от 11 до 12 цифр!"
                     );
-                    //слухач. вызываем функцию hideError при каждом изменении содержимого поля ввода.
-                    //скрываем сообщение об ошибке
                     input.addEventListener("input", hideError);
-                    //фолс-проверка не прошла
                     isValidate = false;
                 } else {
-                    //валидация прошла успешно,
-                    //  создается новый объект с данными о контакте и добавляется в начало массива contacts объекта clientObj
                     clientObj.contacts.unshift({
-                        type: String(input.dataset.type),//тип контакта извлекается из атрибута
-                        value: String(input.value.replace(/[\s\(\)-]/g, "")),//оставляем только цифры
+                        type: String(input.dataset.type),
+                        value: String(input.value.replace(/[\s\(\)-]/g, "")),
                     });
                 }
                 break;
@@ -1383,17 +1081,10 @@ if (!userLastName.value.trim()) {
 
                 break;
             default:
-            //         // console.log(clientObj);
-            //         // debugger;
-            //         clientObj.contacts.unshift({
-            //             type: String(input.dataset.type),
-            //             value: String(input.value),
-            //         });
+
         }
-        //если валидация не прошла возвращаем false
         if (!isValidate) return false;
     }
-    // debugger;
     return {
         isValidate,
     };
