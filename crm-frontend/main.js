@@ -1,5 +1,5 @@
 import { svgPreloader, svgAddContact, svgAdd, svgCrossContact, svgMail, svgVk, svgFb, svgPhone, svgAddPhone, svgOther } from './svg.js'
-
+const API_BASE_URL = 'https://crm-kve9.onrender.com/api';
 window.onload = function () {
     const preloader = document.querySelector('.preloader');
     if (preloader) {
